@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-reset',
@@ -7,9 +9,37 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ResetPage implements OnInit {
 
-  constructor() { }
+  email: string = '';
 
-  ngOnInit() {
+  constructor(
+    private auth: AngularFireAuth,
+    private toastController: ToastController
+  ) {}
+
+  ngOnInit() {}
+
+  async presentToast(message: string, color: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 2000,
+      color: color,
+      position: 'top'
+    });
+    toast.present();
   }
 
+  async resetPassword() {
+    if (!this.email) {
+      this.presentToast('Enter your email', 'danger');
+      return;
+    }
+  
+    try {
+      await this.auth.sendPasswordResetEmail(this.email);
+      this.presentToast('Password reset email sent. Check your inbox.', 'success');
+    } catch (error) {
+      const errorMessage = (error as { message: string }).message; // Type assertion
+      this.presentToast(errorMessage, 'danger');
+    }
+  }
 }
