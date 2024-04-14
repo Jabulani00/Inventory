@@ -1,27 +1,26 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Manager</ion-title>
+    <ion-title class="ion-text-center">Manager</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
-  <ion-segment [(ngModel)]="segment" (ionChange)="segmentChanged($event)">
-    <ion-segment-button value="addInventory">
-      <ion-label>Add Inventory to StoreRoom</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="viewAnalytics">
-      <ion-label>View Analytics</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="viewInventory">
-      <ion-label>View Shop Inventory</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="viewUsers">
-      <ion-label>View Users</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="viewInvoices">
-      <ion-label>View Invoices</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let option of managerOptions">
+        <ion-card button (click)="segmentChanged(option.value)">
+          <ion-card-header>
+            <ion-card-subtitle>
+              <ion-icon [name]="option.icon"></ion-icon> {{ option.label }}
+            </ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            {{ option.description }}
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
   <!-- Placeholder content for different segments -->
   <div *ngIf="segment === 'addInventory'">

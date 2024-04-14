@@ -1,20 +1,40 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>menu</ion-title>
+    <ion-title class="ion-text-center">Menu</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-segment value="custom" >
-    <ion-segment-button value="custom"routerLink="/add-inventory">
-      <ion-label>add Inventory to shop</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="segment" routerLink="/update">
-      <ion-label>Updated Inventory to shop</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="segment" routerLink="/view">
-      <ion-label>View Shop Inventory</ion-label>
-    </ion-segment-button>
-  </ion-segment>
-  
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-card routerLink="/add-inventory" button>
+    <ion-card-header>
+      <ion-card-subtitle>
+        <ion-icon name="add-circle-outline"></ion-icon> Add Inventory
+      </ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      Add new items to your shop's inventory.
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card routerLink="/update" button>
+    <ion-card-header>
+      <ion-card-subtitle>
+        <ion-icon name="refresh-circle-outline"></ion-icon> Update Inventory
+      </ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      Update the details of existing inventory items.
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card routerLink="/view" button>
+    <ion-card-header>
+      <ion-card-subtitle>
+        <ion-icon name="eye-outline"></ion-icon> View Inventory
+      </ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      View the current inventory of your shop.
+    </ion-card-content>
+  </ion-card>
 </ion-content>
