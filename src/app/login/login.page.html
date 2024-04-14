@@ -1,29 +1,26 @@
 <ion-header>
-  <ion-toolbar >
-    <ion-title>
-      Login
-    </ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>Login</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="ion-padding">
   <div class="container">
     <div class="card">
-      <h1>Login</h1>
+      <h1 class="login-title">Login</h1>
       <form>
-       
         <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" [(ngModel)]="email" name="email" id="email" placeholder="Enter your email">
+          <ion-label position="floating">Email</ion-label>
+          <ion-input type="email" [(ngModel)]="email" name="email" id="email" placeholder="Enter your email"></ion-input>
         </div>
         <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" [(ngModel)]="password" name="password" id="password" placeholder="Enter your password">
+          <ion-label position="floating">Password</ion-label>
+          <ion-input type="password" [(ngModel)]="password" name="password" id="password" placeholder="Enter your password"></ion-input>
         </div>
-        <button (click)="login()">LOGIN</button>
+        <ion-button expand="block" color="primary" (click)="login()">LOGIN</ion-button>
       </form>
-      <p>Don't have an account? <a routerLink="/register">sign-up</a></p>
-      <p>........................<a routerLink="/reset">reset</a></p>
+      <p class="signup-link">Don't have an account? <a routerLink="/register">Sign up</a></p>
+      <p class="reset-link"><a routerLink="/reset">Forgot password?</a></p>
     </div>
   </div>
 </ion-content>

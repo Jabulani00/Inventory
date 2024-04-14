@@ -1,10 +1,10 @@
 <ion-header>
-  <ion-toolbar >
+  <ion-toolbar color="primary">
     <ion-title>Sign Up</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="ion-padding">
   <ion-list>
     <ion-item>
       <ion-label position="floating">Name</ion-label>
@@ -23,13 +23,11 @@
         <ion-select-option value="picker">Picker</ion-select-option> 
       </ion-select>
     </ion-item>
-    
 
     <ion-item>
       <ion-label position="floating">Password</ion-label>
       <ion-input type="password" [(ngModel)]="password"></ion-input>
     </ion-item>
-
 
     <ion-item>
       <ion-label position="floating">Confirm Password</ion-label>
@@ -37,10 +35,10 @@
     </ion-item>
   </ion-list>
 
-  <div class="ion-padding">
-    <ion-button expand="block" (click)="Register()">Sign Up</ion-button>
+  <div class="ion-text-center ion-margin">
+    <ion-button expand="block" color="primary" (click)="register()">Sign Up</ion-button>
   </div>
 
-  <p>Already have an account? <a routerLink="/login">Login</a></p>
-      <p>........................<a routerLink="/reset">reset</a></p>
+  <p class="ion-text-center ion-margin-top">Already have an account? <a routerLink="/login">Login</a></p>
+  <p class="ion-text-center">Forgot password? <a routerLink="/reset">Reset</a></p>
 </ion-content>

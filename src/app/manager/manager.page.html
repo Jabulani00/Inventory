@@ -1,0 +1,46 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Manager</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-segment [(ngModel)]="segment" (ionChange)="segmentChanged($event)">
+    <ion-segment-button value="addInventory">
+      <ion-label>Add Inventory to StoreRoom</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="viewAnalytics">
+      <ion-label>View Analytics</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="viewInventory">
+      <ion-label>View Shop Inventory</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="viewUsers">
+      <ion-label>View Users</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="viewInvoices">
+      <ion-label>View Invoices</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Placeholder content for different segments -->
+  <div *ngIf="segment === 'addInventory'">
+    <router-outlet></router-outlet>
+  </div>
+
+  <div *ngIf="segment === 'viewAnalytics'">
+    <router-outlet></router-outlet>
+  </div>
+
+  <div *ngIf="segment === 'viewInventory'">
+    <router-outlet></router-outlet>
+  </div>
+
+  <div *ngIf="segment === 'viewUsers'">
+    <router-outlet></router-outlet>
+  </div>
+
+  <div *ngIf="segment === 'viewInvoices'">
+    <router-outlet></router-outlet>
+  </div>
+</ion-content>

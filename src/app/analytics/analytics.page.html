@@ -1,13 +1,42 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>analytics</ion-title>
+    <ion-label>Analytics</ion-label>
+    <ion-icon routerLink="/home" slot="end" name="arrow-back-outline"></ion-icon>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">analytics</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <div class="scroll-container">
+    <p class="pp">STORE INVENTORY</p>
+    <div class="chart-container">
+      
+      <br>
+      <canvas id="quantityByCategoryChart"></canvas>
+    </div>
+ <br>
+ <br>
+ <p class="pp">STOREROOM INVENTORY</p>
+    <div class="chart-container">
+     
+      <br>
+      <canvas id="quantityByCategoryStorommChart"></canvas>
+    </div>
+    <br>
+    <br>
+    
+      <p class="pp">TOTAL CATEGORY COMPARISON ON BOTH STORE AND STOREROOM</p>
+    
+      <canvas id="categoryComparisonChart"></canvas>
+
+
+     <br>
+     <br>
+<p class="pp">TOTAL PRODUCT QUANTITIES </p>
+<canvas id="totalQuantitiesChart"></canvas>
+
+<br>
+<br>
+<p class="pp">BEST PERFOMING PRODUCT</p>
+<canvas id="updateFrequencyChart"></canvas>
+  </div>
 </ion-content>

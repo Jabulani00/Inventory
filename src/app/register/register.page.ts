@@ -28,7 +28,7 @@ export class RegisterPage implements OnInit {
   ngOnInit() {
   }
 
-  async Register() {
+  async register() {
     if (this.name =='') 
       {
         alert("Enter your full name")
@@ -73,7 +73,7 @@ export class RegisterPage implements OnInit {
 
 
               console.log('User data added successfully');
-              this.router.navigate(['/profile']);
+              this.router.navigate(['/login']);
             })
             
             .catch((error: any) => { // Explicitly specify type
