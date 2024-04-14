@@ -26,11 +26,13 @@
   }
   
   .login-link a {
-    color: var(--ion-color-primary);
+    color: #2c786c;
     text-decoration: none;
   }
   
   .login-link a:hover {
     text-decoration: underline;
   }
-  
+  ion-button{
+    --background:#2c786c;
+  }

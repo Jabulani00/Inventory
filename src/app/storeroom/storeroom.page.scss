@@ -1,61 +1,113 @@
 
-ion-toolbar {
-    --background: #c24d2c; 
-    color:#fff;
-    text-align: center;
-  }
 
-ion-segment {
-  --background: #c24d2c;
+
+
+ion-header ion-title {
   font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-/* General Styles */
-ion-content {
-  --background: #f7f7f7;
-  --ion-font-family: 'Poppins', sans-serif;
+/* Searchbar Styles */
+ion-searchbar {
+  --background: #fff;
+  --color: #333;
+  --placeholder-color: #999;
+  --icon-color: #2c786c;
+  margin: 16px;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* List Header Styles */
+ion-list-header {
+  --background: #2c786c;
+  --color: #fff;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 8px 16px;
+}
+
+/* Select Styles */
+ion-select {
+  --placeholder-color: #999;
+  --placeholder-opacity: 1;
+  --color: #333;
+  --background: #fff;
+  border-radius: 20px;
+  padding: 8px 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Segment Styles */
+ion-segment {
+  --background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 16px;
+}
+
+ion-segment-button {
+  --color: #333;
+  --color-checked: #2c786c;
+  --background-checked: #ffecd2;
+  --indicator-color: transparent;
+  --border-radius: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
 
 /* Inventory Item Styles */
 .inventory-item {
-  margin-bottom: 20px;
+  --background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 16px;
 }
 
-.animated-header {
-  background-color: #c24d2c;
-  color: #fff;
-  animation: pulse 2s infinite;
+.inventory-item ion-thumbnail {
+  --border-radius: 10px;
+  --size: 80px;
+  margin: 8px;
 }
 
-.animated-content {
-  background-color: #f5f5f5;
-  animation: fadeIn 1s;
+.inventory-item ion-label h2 {
+  font-weight: bold;
+  color: #2c786c;
 }
 
-.thumbnail {
-  max-width: 100px;
-  max-height: 100px;
-  margin-top: 10px;
+.inventory-item ion-label p {
+  margin: 4px 0;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
+.inventory-item ion-label p ion-icon {
+  color: #2c786c;
+  margin-right: 8px;
 }
 
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+.inventory-item ion-button {
+  --background: #2c786c;
+  --color: #fff;
+  --border-radius: 20px;
+  margin: 8px;
+}
+
+/* Modal Styles */
+ion-modal ion-toolbar {
+  --background: #2c786c;
+  --color: #fff;
+}
+
+ion-modal ion-content {
+  --background: #fff;
+  text-align: center;
+}
+
+ion-modal img {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  margin: 16px 0;
 }

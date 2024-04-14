@@ -36,13 +36,7 @@ const routes: Routes = [
     loadChildren: () =>
       import('./invoice/invoice.module').then((m) => m.InvoicePageModule),
   },
-  {
-    path: 'inventory',
-    loadChildren: () =>
-      import('./inventory/inventory.module').then(
-        (m) => m.InventoryPageModule
-      ),
-  },
+  
   {
     path: 'profile',
     loadChildren: () =>

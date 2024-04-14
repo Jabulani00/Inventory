@@ -1,5 +1,5 @@
 <ion-header [translucent]="true">
-  <ion-toolbar color="primary">
+  <ion-toolbar >
     <ion-title>Reset Password</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -13,7 +13,7 @@
           <ion-label position="floating">Email</ion-label>
           <ion-input type="email" id="email" placeholder="Enter your email" [(ngModel)]="email" name="email"></ion-input>
         </div>
-        <ion-button expand="block" color="primary" type="submit">Reset</ion-button>
+        <ion-button expand="block"  type="submit">Reset</ion-button>
       </form>
       <p class="login-link ion-text-center">Already have an account? <a routerLink="/login">Login</a></p>
     </div>

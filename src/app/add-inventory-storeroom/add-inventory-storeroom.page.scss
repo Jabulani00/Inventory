@@ -1,5 +1,58 @@
-ion-toolbar {
-    --background: #c24d2c; 
-    color:#fff;
-    text-align: center;
-  }
+/* Custom styles for Add Inventory page */
+
+ion-card {
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+ion-card-header {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+ion-card-content {
+  padding: 20px;
+}
+
+ion-item {
+  margin-bottom: 15px;
+}
+
+ion-label {
+  font-weight: bold;
+}
+
+ion-button {
+  --background: #007bff;
+  --color: #fff;
+  --border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+ion-toggle {
+  --background: #007bff;
+  --handle-background: #fff;
+}
+
+ion-select {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+ion-input, ion-textarea {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+ion-datetime {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+ion-icon {
+  color: #007bff;
+}

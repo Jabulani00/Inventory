@@ -1,45 +1,22 @@
-ion-content {
-    max-height: calc(100vh - 56px); /* Adjust height as needed */
-}
-
-.scroll-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 100%;
-    overflow-x: auto;
-    overflow-y: auto;
-}
-
 .chart-container {
-    width: 100%;
-    height: 400px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-shrink: 0;
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f4f4f4;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-  
 
-  ion-header {
-    ion-toolbar {
-      --background: #c24d2c; 
-      color:#fff;
-      text-align: center;
-    }
-  }
+canvas {
+  width: 100%;
+  height: auto;
+}
 
-  ion-segment-button{
-    font-size: 27px;
-      font-weight: bold;
-  }
-
-  ion-icon{
-    font-size: 30px;
-    font-weight: bolder;
-  }
-  .pp{
-    font-size: 21px;
-    font-weight: bolder;
-    color:#c24d2c;
-  }
+ion-segment {
+  margin-top: 20px;
+}
+ion-segment-button {
+  font-size: 17px; /* Adjust the font size as needed */
+}
+.top{
+  font-size: 13px;
+}

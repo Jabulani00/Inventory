@@ -1,42 +1,54 @@
 <ion-header>
   <ion-toolbar>
-    <ion-label>Analytics</ion-label>
-    <ion-icon routerLink="/home" slot="end" name="arrow-back-outline"></ion-icon>
+    <ion-title>Analytics</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/manager">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <div class="scroll-container">
-    <p class="pp">STORE INVENTORY</p>
-    <div class="chart-container">
-      
-      <br>
-      <canvas id="quantityByCategoryChart"></canvas>
-    </div>
- <br>
- <br>
- <p class="pp">STOREROOM INVENTORY</p>
-    <div class="chart-container">
-     
-      <br>
-      <canvas id="quantityByCategoryStorommChart"></canvas>
-    </div>
-    <br>
-    <br>
-    
-      <p class="pp">TOTAL CATEGORY COMPARISON ON BOTH STORE AND STOREROOM</p>
-    
-      <canvas id="categoryComparisonChart"></canvas>
+  <ion-segment  (ionChange)="segmentChanged($event)">
+    <ion-segment-button class="top" value="store-inventory" checked>
+      <ion-label>Store </ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="storeroom-inventory">
+      <ion-label>Storeroom </ion-label>
+    </ion-segment-button>
+   
+    <ion-segment-button value="best-performing-product">
+      <ion-label>Best Performing Product</ion-label>
+    </ion-segment-button>
+  </ion-segment>
 
-
-     <br>
-     <br>
-<p class="pp">TOTAL PRODUCT QUANTITIES </p>
-<canvas id="totalQuantitiesChart"></canvas>
-
-<br>
-<br>
-<p class="pp">BEST PERFOMING PRODUCT</p>
-<canvas id="updateFrequencyChart"></canvas>
+  <div id="store-inventory-chart" class="chart-container">
+    <canvas id="quantityByCategoryChart"></canvas>
   </div>
+
+  <div id="storeroom-inventory-chart" class="chart-container" style="display: none;">
+    <canvas id="quantityByCategoryStorommChart"></canvas>
+  </div>
+
+  <div id="category-comparison-chart" class="chart-container" style="display: none;">
+    <canvas id="categoryComparisonChart"></canvas>
+  </div>
+
+  <div id="total-quantities-chart" class="chart-container" style="display: none;">
+    <canvas id="totalQuantitiesChart"></canvas>
+  </div>
+
+  <div id="best-performing-product-chart" class="chart-container" style="display: none;">
+    <canvas id="updateFrequencyChart"></canvas>
+  </div>
+
+  <ion-segment  (ionChange)="segmentChanged($event)">
+    <ion-segment-button value="category-comparison">
+      <ion-label>Category Comparison</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="total-quantities">
+      <ion-label>Total Quantities</ion-label>
+    </ion-segment-button>
+  </ion-segment>
 </ion-content>

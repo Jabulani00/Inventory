@@ -3,12 +3,12 @@ ion-item {
   }
   
   ion-button {
-    --background: var(--ion-color-primary);
+    --background: #2c786c;
     --border-radius: 25px;
   }
   
   ion-button:hover {
-    --background: var(--ion-color-primary-shade);
+    --background: #004445;
   }
   
   ion-select {
@@ -21,24 +21,21 @@ ion-item {
   }
   
   ion-item ion-label {
-    color: var(--ion-color-primary);
+    color: #2c786c;
   }
   
   ion-item ion-select {
-    color: var(--ion-color-primary);
+    color: #2c786c;
   }
   
   ion-item ion-select::part(text) {
-    color: var(--ion-color-primary);
+    color: #2c786c;
   }
   
   .ion-text-center {
     text-align: center;
   }
   
-  ion-header {
-    ion-toolbar {
-      --background: #c24d2c; 
-      color:#fff;
-    }
+  ion-button{
+    --background:#2c786c;
   }

@@ -1,25 +1,32 @@
 <ion-header>
   <ion-toolbar>
-    <ion-label>Invoices</ion-label>
+    <ion-title class="ion-text-center">Invoices</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <ion-list>
-    <ion-item *ngFor="let slip of slips">
-      <ion-card *ngFor="let item of slip.items">
+    <ion-item-group *ngFor="let slip of slips">
+      <ion-item-divider color="light">
+        <ion-label>
+          <h2>{{ slip.slipTitle }}</h2>
+          <p>{{ slip.slipDate }}</p>
+        </ion-label>
+      </ion-item-divider>
+
+      <ion-card *ngFor="let item of slip.items" class="item-card">
         <ion-card-header class="card-header">
-          <ion-card-title>{{ item.name }}</ion-card-title>
+          <ion-card-title class="item-title">{{ item.name }}</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <p class="item-details">Quantity: {{ item.quantity }}</p>
-          <p class="item-details">Category: {{ item.category }}</p>
-          <p class="item-details">Barcode: {{ item.barcode }}</p>
-          <p class="item-details">Description: {{ item.description }}</p>
-          <p class="item-details">Date of Pickup: {{ item.dateOfPickup }}</p>
-          <p class="item-details">Time of Pickup: {{ item.timeOfPickup }}</p>
+          <p class="item-details"><ion-icon name="cube-outline"></ion-icon> Quantity: {{ item.quantity }}</p>
+          <p class="item-details"><ion-icon name="grid-outline"></ion-icon> Category: {{ item.category }}</p>
+          <p class="item-details"><ion-icon name="barcode-outline"></ion-icon> Barcode: {{ item.barcode }}</p>
+          <p class="item-details"><ion-icon name="text-outline"></ion-icon> Description: {{ item.description }}</p>
+          <p class="item-details"><ion-icon name="calendar-outline"></ion-icon> Date of Pickup: {{ item.dateOfPickup }}</p>
+          <p class="item-details"><ion-icon name="time-outline"></ion-icon> Time of Pickup: {{ item.timeOfPickup }}</p>
         </ion-card-content>
       </ion-card>
-    </ion-item>
+    </ion-item-group>
   </ion-list>
 </ion-content>

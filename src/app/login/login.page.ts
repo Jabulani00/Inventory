@@ -91,56 +91,42 @@ export class LoginPage implements OnInit {
     const userData = userQuerySnapshot.docs[0].data();
 
     if (userData) {
-      if (userData) {
-        if (userData['status'] === 'active') {
-          const role = userData['role']; // Get the role field from userData
-          let redirectPage: string;
+      const role = userData['role']; // Get the role field from userData
+      let redirectPage: string;
       
-          // Check the role and set the redirectPage accordingly
-          switch (role) {
-            case 'manager':
-              redirectPage = '/manager'; // Route to manager page
-              break;
-            case 'picker':
-              redirectPage = '/menu'; // Route to menu page
-              break;
-            default:
-              redirectPage = '/home'; // Default redirection to home page
-              break;
-          }
-      
-          this.auth
-            .signInWithEmailAndPassword(this.email, this.password)
-            .then((userCredential) => {
-              loader.dismiss();
-              const user = userCredential.user;
-              this.router.navigate([redirectPage]); // Navigate based on the role
-            })
-            .catch((error) => {
-              loader.dismiss();
-              const errorMessage = error.message;
-              if (errorMessage.includes('wrong-password')) {
-                this.presentToast('Incorrect password', 'danger');
-              } else {
-                this.presentToast(errorMessage, 'danger');
-              }
-            });
-        } else if (userData['status'] === 'denied') {
-          loader.dismiss();
-          this.presentToast('You are not allowed in the system', 'danger');
-        } else if (userData['status'] === 'pending') {
-          loader.dismiss();
-          this.presentToast(
-            'Your account is pending. Please wait for admin approval.',
-            'warning'
-          );
-        } else {
-          loader.dismiss();
-          this.presentToast('You are not allowed in the system', 'danger');
-        }
+      // Check the role and set the redirectPage accordingly
+      switch (role) {
+        case 'manager':
+          redirectPage = '/manager'; // Route to manager page
+          break;
+        case 'picker':
+          redirectPage = '/menu'; // Route to menu page
+          break;
+        default:
+          redirectPage = '/home'; // Default redirection to home page
+          break;
       }
       
+      this.auth
+        .signInWithEmailAndPassword(this.email, this.password)
+        .then((userCredential) => {
+          loader.dismiss();
+          const user = userCredential.user;
+          this.router.navigate([redirectPage]); // Navigate based on the role
+        })
+        .catch((error) => {
+          loader.dismiss();
+          const errorMessage = error.message;
+          if (errorMessage.includes('wrong-password')) {
+            this.presentToast('Incorrect password', 'danger');
+          } else {
+            this.presentToast(errorMessage, 'danger');
+          }
+        });
+    } else {
+      loader.dismiss();
+      this.presentToast('You are not allowed in the system', 'danger');
+    }
   }
 
-  }
 }

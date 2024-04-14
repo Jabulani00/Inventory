@@ -28,7 +28,7 @@
   
   .signup-link a,
   .reset-link a {
-    color: var(--ion-color-primary);
+    color: #2c786c;
     text-decoration: none;
   }
   
@@ -37,9 +37,6 @@
     text-decoration: underline;
   }
   
-  ion-header {
-    ion-toolbar {
-      --background: #c24d2c; 
-      color:#fff;
-    }
+  ion-button{
+    --background:#2c786c;
   }

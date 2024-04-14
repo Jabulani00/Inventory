@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Renderer2, ElementRef, QueryList, ViewChildren  } from '@angular/core';
 import Chart from 'chart.js/auto';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { map, combineLatest, Observable } from 'rxjs';
+
 
 
 
@@ -19,9 +20,12 @@ interface CategoryComparisonData {
   storeroomQuantity: number;
 }
 
+
 interface TotalQuantitiesData {
   category: string;
-  totalQuantity: number;
+  totalQuantity: number; // Add the missing property
+  inventoryQuantity: number; // Add inventory quantity property
+  storeroomQuantity: number; // Add storeroom quantity property
 }
 interface UpdateFrequencyData {
   category: string;
@@ -34,7 +38,8 @@ interface UpdateFrequencyData {
   styleUrls: ['./analytics.page.scss'],
 })
 export class AnalyticsPage implements OnInit {
-  constructor(private firestore: AngularFirestore) {}
+  @ViewChildren('chartContainer') chartContainers!: QueryList<ElementRef>;
+  constructor(private renderer: Renderer2, private firestore: AngularFirestore) {}
 
   ngOnInit() {
     this.generateQuantityByCategoryChart();
@@ -44,6 +49,22 @@ export class AnalyticsPage implements OnInit {
     this.generateUpdateFrequencyChart();
   }
 
+  segmentChanged(event: CustomEvent) {
+    const selectedSegment = event.detail.value;
+    const chartContainers = document.querySelectorAll('.chart-container');
+  
+    chartContainers.forEach(container => {
+      const chartContainer = container as HTMLElement;
+      if (chartContainer.id === `${selectedSegment}-chart`) {
+        chartContainer.style.display = 'block';
+      } else {
+        chartContainer.style.display = 'none';
+      }
+    });
+  }
+  
+  
+  
   generateUpdateFrequencyChart() {
     combineLatest([
       this.firestore.collection('inventory').valueChanges(),
@@ -85,7 +106,7 @@ export class AnalyticsPage implements OnInit {
       .subscribe((updateFrequencyData: UpdateFrequencyData[]) => {
         const ctx = document.getElementById('updateFrequencyChart') as HTMLCanvasElement;
         new Chart(ctx, {
-          type: 'bar',
+          type: 'radar', // Change chart type to radar
           data: {
             labels: updateFrequencyData.map((item) => item.productName),
             datasets: [
@@ -99,9 +120,8 @@ export class AnalyticsPage implements OnInit {
             ],
           },
           options: {
-            indexAxis: 'y',
             scales: {
-              x: {
+              r: {
                 beginAtZero: true,
               },
             },
@@ -109,6 +129,7 @@ export class AnalyticsPage implements OnInit {
         });
       });
   }
+  
 
   generateQuantityByCategoryChart() {
     this.firestore
@@ -133,35 +154,27 @@ export class AnalyticsPage implements OnInit {
           const totalQuantity = categoryItems.reduce((acc, curr) => acc + curr.quantity, 0);
           return totalQuantity;
         });
-
+  
         const lowQuantityThreshold = 10; // Set the low quantity threshold
         const lowQuantityCategories = uniqueCategories.filter((category, index) => {
           return quantitiesByCategory[index] < lowQuantityThreshold;
         });
-
+  
         const ctx = document.getElementById('quantityByCategoryChart') as HTMLCanvasElement;
         new Chart(ctx, {
-          type: 'bar',
+          type: 'pie', // Change chart type to pie
           data: {
             labels: uniqueCategories,
             datasets: [
               {
                 label: 'Quantity',
                 data: quantitiesByCategory,
-                backgroundColor: (context) => {
-                  const index = context.dataIndex;
-                  const category = uniqueCategories[index];
-                  return lowQuantityCategories.includes(category)
-                    ? 'rgba(255, 99, 132, 0.2)' // Red color for low quantity
-                    : 'rgba(75, 192, 192, 0.2)'; // Default color
-                },
-                borderColor: (context) => {
-                  const index = context.dataIndex;
-                  const category = uniqueCategories[index];
-                  return lowQuantityCategories.includes(category)
-                    ? 'rgba(255, 99, 132, 1)' // Red color for low quantity
-                    : 'rgba(75, 192, 192, 1)'; // Default color
-                },
+                backgroundColor: uniqueCategories.map((category) =>
+                  lowQuantityCategories.includes(category) ? 'rgba(255, 99, 132, 0.2)' : 'rgba(75, 192, 192, 0.2)'
+                ),
+                borderColor: uniqueCategories.map((category) =>
+                  lowQuantityCategories.includes(category) ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)'
+                ),
                 borderWidth: 1,
               },
             ],
@@ -176,6 +189,7 @@ export class AnalyticsPage implements OnInit {
         });
       });
   }
+  
 
 
   generateQuantityByCategory(){
@@ -201,49 +215,39 @@ export class AnalyticsPage implements OnInit {
           const totalQuantity = categoryItems.reduce((acc, curr) => acc + curr.quantity, 0);
           return totalQuantity;
         });
-
+  
         const lowQuantityThreshold = 10; // Set the low quantity threshold
         const lowQuantityCategories = uniqueCategories.filter((category, index) => {
           return quantitiesByCategory[index] < lowQuantityThreshold;
         });
-
+  
         const ctx = document.getElementById('quantityByCategoryStorommChart') as HTMLCanvasElement;
         new Chart(ctx, {
-          type: 'bar',
+          type: 'doughnut', // Change chart type to doughnut
           data: {
             labels: uniqueCategories,
             datasets: [
               {
                 label: 'Quantity',
                 data: quantitiesByCategory,
-                backgroundColor: (context) => {
-                  const index = context.dataIndex;
-                  const category = uniqueCategories[index];
-                  return lowQuantityCategories.includes(category)
-                    ? 'rgba(255, 99, 132, 0.2)' // Red color for low quantity
-                    : 'rgba(75, 192, 192, 0.2)'; // Default color
-                },
-                borderColor: (context) => {
-                  const index = context.dataIndex;
-                  const category = uniqueCategories[index];
-                  return lowQuantityCategories.includes(category)
-                    ? 'rgba(255, 99, 132, 1)' // Red color for low quantity
-                    : 'rgba(75, 192, 192, 1)'; // Default color
-                },
+                backgroundColor: uniqueCategories.map((category) =>
+                  lowQuantityCategories.includes(category) ? 'rgba(255, 99, 132, 0.2)' : 'rgba(75, 192, 192, 0.2)'
+                ),
+                borderColor: uniqueCategories.map((category) =>
+                  lowQuantityCategories.includes(category) ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)'
+                ),
                 borderWidth: 1,
               },
             ],
           },
           options: {
-            scales: {
-              y: {
-                beginAtZero: true,
-              },
-            },
+            cutout: '70%', // Set the size of the hole in the center
           },
         });
       });
   }
+  
+
 
 
   generateCategoryComparisonChart() {
@@ -273,46 +277,62 @@ export class AnalyticsPage implements OnInit {
           const allItems = [...inventoryItems, ...storeroomItems];
           const categories = Array.from(new Set(allItems.map((item) => item.category)));
   
-          const comparisonData: CategoryComparisonData[] = categories.map((category) => {
+          // Initialize arrays to store inventory and storeroom quantities for each category
+          const inventoryQuantities: number[] = [];
+          const storeroomQuantities: number[] = [];
+  
+          // Iterate through categories and calculate quantities
+          categories.forEach((category) => {
             const inventoryQuantity = inventoryItems
               .filter((item) => item.category === category)
               .reduce((acc, curr) => acc + curr.quantity, 0);
             const storeroomQuantity = storeroomItems
               .filter((item) => item.category === category)
               .reduce((acc, curr) => acc + curr.quantity, 0);
-            return { category, inventoryQuantity, storeroomQuantity };
+            
+            // Push quantities into respective arrays
+            inventoryQuantities.push(inventoryQuantity);
+            storeroomQuantities.push(storeroomQuantity);
           });
   
-          return comparisonData;
+          return { categories, inventoryQuantities, storeroomQuantities };
         })
       )
-      .subscribe((comparisonData: CategoryComparisonData[]) => {
+      .subscribe(({ categories, inventoryQuantities, storeroomQuantities }) => {
         const ctx = document.getElementById('categoryComparisonChart') as HTMLCanvasElement;
         new Chart(ctx, {
-          type: 'pie',
+          type: 'bar',
           data: {
-            labels: comparisonData.map((item) => item.category),
+            labels: categories,
             datasets: [
               {
                 label: 'Inventory',
-                data: comparisonData.map((item) => item.inventoryQuantity),
+                data: inventoryQuantities,
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1,
               },
               {
                 label: 'Storeroom',
-                data: comparisonData.map((item) => item.storeroomQuantity),
+                data: storeroomQuantities,
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 borderColor: 'rgba(255, 99, 132, 1)',
                 borderWidth: 1,
               },
             ],
           },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
         });
       });
   }
-
+  
+  
   generateTotalQuantitiesChart() {
     combineLatest([
       this.firestore.collection('inventory').valueChanges(),
@@ -336,46 +356,51 @@ export class AnalyticsPage implements OnInit {
               barcode: item.barcode, // Include the barcode property
             })
           );
-
+  
           const allItems = [...inventoryItems, ...storeroomItems];
           const categories = Array.from(new Set(allItems.map((item) => item.name)));
           const totalQuantities: TotalQuantitiesData[] = categories.map((category) => {
-            const categoryItems = allItems.filter((item) => item.name === category);
-            const totalQuantity = categoryItems.reduce((acc, curr) => acc + curr.quantity, 0);
-            return { category, totalQuantity };
+            const inventoryQuantity = inventoryItems
+              .filter((item) => item.name === category)
+              .reduce((acc, curr) => acc + curr.quantity, 0);
+            const storeroomQuantity = storeroomItems
+              .filter((item) => item.name === category)
+              .reduce((acc, curr) => acc + curr.quantity, 0);
+            const totalQuantity = inventoryQuantity + storeroomQuantity; // Calculate total quantity
+            return { category, totalQuantity, inventoryQuantity, storeroomQuantity };
           });
-
+  
           return totalQuantities;
         })
       )
       .subscribe((totalQuantities: TotalQuantitiesData[]) => {
         const ctx = document.getElementById('totalQuantitiesChart') as HTMLCanvasElement;
         new Chart(ctx, {
-          type: 'pie',
+          type: 'bar',
           data: {
             labels: totalQuantities.map((item) => item.category),
             datasets: [
               {
-                data: totalQuantities.map((item) => item.totalQuantity),
-                backgroundColor: [
-                  'rgba(255, 99, 132, 0.2)',
-                  'rgba(54, 162, 235, 0.2)',
-                  'rgba(255, 206, 86, 0.2)',
-                  'rgba(75, 192, 192, 0.2)',
-                  'rgba(153, 102, 255, 0.2)',
-                  'rgba(255, 159, 64, 0.2)',
-                ],
-                borderColor: [
-                  'rgba(255, 99, 132, 1)',
-                  'rgba(54, 162, 235, 1)',
-                  'rgba(255, 206, 86, 1)',
-                  'rgba(75, 192, 192, 1)',
-                  'rgba(153, 102, 255, 1)',
-                  'rgba(255, 159, 64, 1)',
-                ],
+                label: 'Inventory',
+                data: totalQuantities.map((item) => item.inventoryQuantity),
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+              },
+              {
+                label: 'Storeroom Inventory',
+                data: totalQuantities.map((item) => item.storeroomQuantity),
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
                 borderWidth: 1,
               },
             ],
+          },
+          options: {
+            scales: {
+              x: { stacked: true }, // Stack bars horizontally
+              y: { stacked: true }, // Stack bars vertically
+            },
           },
         });
       });
