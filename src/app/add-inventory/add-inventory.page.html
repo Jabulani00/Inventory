@@ -4,11 +4,16 @@
       <ion-back-button defaultHref="/menu"></ion-back-button>
     </ion-buttons>
     <ion-title class="ion-text-center">Add Inventory</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeScanner()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-card class="add-item-card">
+  <ion-card id="container" class="add-item-card">
     <ion-card-header class="card-header">
       <ion-card-title>New Item Details</ion-card-title>
     </ion-card-header>
@@ -21,7 +26,7 @@
           <ion-toggle labelPlacement="end" [(ngModel)]="toggleChecked">Type barcode</ion-toggle>
         </ion-item>
         <ion-item *ngIf="toggleChecked">
-          <ion-input type="text" [(ngModel)]="barcode" placeholder="Enter barcode"></ion-input>
+          <ion-input type="text" (ionChange)="searchProductByBarcode()" [(ngModel)]="barcode" placeholder="Enter barcode"></ion-input>
         </ion-item>
         <ion-item *ngIf="!toggleChecked">
           <ion-button expand="block" (click)="scanBarcode()">

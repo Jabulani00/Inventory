@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Renderer2  } from '@angular/core';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { finalize } from 'rxjs/operators';
@@ -28,6 +28,7 @@ export class UpdatePage implements OnInit {
   newImage :any;
 
   constructor(
+    private renderer: Renderer2,
     private route: ActivatedRoute,
     private router: Router,
     private firestore: AngularFirestore,
@@ -41,7 +42,31 @@ export class UpdatePage implements OnInit {
     document.querySelector('body')?.classList.remove('scanner-active'); 
   }
 
+  hideCard() {
+    const cardElement = document.getElementById('container');
+    if (cardElement) {
+      this.renderer.setStyle(cardElement, 'display', 'none'); // Use Renderer2's setStyle()
+    }
+  }
+showCard() {
+    const cardElement = document.getElementById('container');
+    if (cardElement) {
+      this.renderer.setStyle(cardElement, 'display', 'contents'); // Use Renderer2's setStyle()
+    }
+  }
+  async closeScanner(){
+    this.showCard();
+    const result = await BarcodeScanner.stopScan(); // start scanning and wait for a result
+    // if the result has content
+  
+    window.document.querySelector('ion-app')?.classList.remove('cameraView');
+    document.querySelector('body')?.classList.remove('scanner-active');
+  }
+
   async scanBarcode() {
+    this.hideCard();
+   
+    window.document.querySelector('ion-app')?.classList.add('cameraView');
     document.querySelector('body')?.classList.add('scanner-active');
     await BarcodeScanner.checkPermission({ force: true });
     // make background of WebView transparent
@@ -52,6 +77,9 @@ export class UpdatePage implements OnInit {
     if (result.hasContent) {
       this.barcode = result.content;
       console.log(result.content); // log the raw scanned content
+      this.showCard()
+      window.document.querySelector('ion-app')?.classList.remove('cameraView');
+      document.querySelector('body')?.classList.remove('scanner-active');
     }
   }
 
