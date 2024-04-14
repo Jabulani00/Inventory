@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { LoadingController, NavController, ToastController } from '@ionic/angular';
+import { LoadingController, ToastController } from '@ionic/angular';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 
@@ -12,30 +12,30 @@ import 'firebase/compat/firestore';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
-
   email: string = '';
   password: string = '';
-
-  // Default admin credentials
   defaultAdminEmail: string = 'admin@best.com';
   defaultAdminPassword: string = '@bestB1234';
+
+  private usersCollection: AngularFirestoreCollection<any>;
 
   constructor(
     private router: Router,
     private loadingController: LoadingController,
-    private controller: NavController,
     private auth: AngularFireAuth,
     private firestore: AngularFirestore,
-    private toastController: ToastController // Inject ToastController
-  ) {}
+    private toastController: ToastController
+  ) {
+    this.usersCollection = this.firestore.collection('Users');
+  }
 
   ngOnInit() {}
 
   async presentToast(message: string, color: string) {
     const toast = await this.toastController.create({
-      message: message,
+      message,
       duration: 2000,
-      color: color,
+      color,
       position: 'top',
     });
     toast.present();
@@ -43,7 +43,7 @@ export class LoginPage implements OnInit {
 
   async login() {
     // Email validation
-    if (this.email.trim() === '') {
+    if (!this.email.trim()) {
       this.presentToast('Please enter your email address', 'danger');
       return;
     }
@@ -56,7 +56,7 @@ export class LoginPage implements OnInit {
     }
 
     // Password validation
-    if (this.password.trim() === '') {
+    if (!this.password.trim()) {
       this.presentToast('Please enter your password', 'danger');
       return;
     }
@@ -74,59 +74,48 @@ export class LoginPage implements OnInit {
       return;
     }
 
-    // Query Firestore to find the document with the matching email
-    const userQuerySnapshot = await firebase
-      .firestore()
-      .collection('Users')
-      .where('email', '==', this.email)
-      .get();
+    try {
+      // Query Firestore to find the document with the matching email
+      const userQuerySnapshot = await this.usersCollection.ref.where('email', '==', this.email).get();
 
-    if (userQuerySnapshot.empty) {
-      loader.dismiss();
-      this.presentToast('User does not exist', 'danger');
-      return;
-    }
+      if (userQuerySnapshot.empty) {
+        loader.dismiss();
+        this.presentToast('User does not exist', 'danger');
+        return;
+      }
 
-    // Since email is unique, there should be only one document in the query snapshot
-    const userData = userQuerySnapshot.docs[0].data();
+      // Since email is unique, there should be only one document in the query snapshot
+      const userData = userQuerySnapshot.docs[0].data();
+      const role = userData['role'];
 
-    if (userData) {
-      const role = userData['role']; // Get the role field from userData
       let redirectPage: string;
-      
+
       // Check the role and set the redirectPage accordingly
       switch (role) {
-        case 'manager':
-          redirectPage = '/manager'; // Route to manager page
+        case 'Manager':
+          redirectPage = '/manager';
           break;
         case 'picker':
-          redirectPage = '/menu'; // Route to menu page
+          redirectPage = '/menu';
           break;
         default:
-          redirectPage = '/home'; // Default redirection to home page
+          redirectPage = '/view';
           break;
       }
-      
-      this.auth
-        .signInWithEmailAndPassword(this.email, this.password)
-        .then((userCredential) => {
-          loader.dismiss();
-          const user = userCredential.user;
-          this.router.navigate([redirectPage]); // Navigate based on the role
-        })
-        .catch((error) => {
-          loader.dismiss();
-          const errorMessage = error.message;
-          if (errorMessage.includes('wrong-password')) {
-            this.presentToast('Incorrect password', 'danger');
-          } else {
-            this.presentToast(errorMessage, 'danger');
-          }
-        });
-    } else {
+
+      await this.auth.signInWithEmailAndPassword(this.email, this.password);
       loader.dismiss();
-      this.presentToast('You are not allowed in the system', 'danger');
+      this.router.navigate([redirectPage]);
+    } catch (error: any) { // Explicitly define the type of 'error' as 'any'
+      loader.dismiss();
+      const errorMessage = error.message || 'An unknown error occurred.'; // Handle the case where error.message is undefined
+      if (errorMessage.includes('wrong-password')) {
+        this.presentToast('Incorrect password', 'danger');
+      } else if (errorMessage.includes('user-not-found')) {
+        this.presentToast('User does not exist', 'danger');
+      } else {
+        this.presentToast(errorMessage, 'danger');
+      }
     }
   }
-
 }
