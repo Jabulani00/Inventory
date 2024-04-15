@@ -7,11 +7,15 @@
 }
 
 .card-header {
-  --background: #3880ff;
+  --background: #2c786c;
   color: #fff;
   padding: 16px;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
+}
+ion-fab-button{
+  --background: #2c786c; 
+
 }
 
 .card-header ion-card-title {
@@ -46,6 +50,8 @@ ion-select {
 ion-button {
   margin: 16px;
   --border-radius: 20px;
+  --background: #2c786c; 
+
 }
 
 .custom-file-input {

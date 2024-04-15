@@ -1,22 +1,39 @@
-.chart-container {
-  margin-top: 20px;
-  padding: 10px;
-  background-color: #f4f4f4;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-canvas {
-  width: 100%;
-  height: auto;
-}
-
-ion-segment {
-  margin-top: 20px;
-}
+/* Reset default styles */
 ion-segment-button {
-  font-size: 17px; /* Adjust the font size as needed */
+  --color: #ffffff;
+  --color-checked: #ffffff;
+  --background: #2c786c;
+  --background-checked: #004445;
+  --indicator-color: #ffffff;
+  font-size: 10px;
 }
-.top{
-  font-size: 13px;
+
+ion-segment-button ion-label {
+  padding: 8px 12px;
+}
+
+/* Segment styles */
+ion-segment {
+  margin-bottom: 20px;
+}
+
+/* Chart container styles */
+.chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+/* Chart styles */
+canvas {
+  margin: 20px;
+}
+
+/* Hide/Show chart containers */
+#storeroom-inventory-chart,
+#category-comparison-chart,
+#total-quantities-chart,
+#best-performing-product-chart {
+  display: none;
 }

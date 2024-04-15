@@ -71,12 +71,15 @@
     </ion-row>
 
 
-    <ion-button  expand="block" id="fileInput" color="medium" class="custom-file-input" (click)="takePicture()">
-      <ion-icon name="camera"></ion-icon>
-      Take Picture
-    </ion-button >
+  
 
+    <ion-fab  horizontal="end">
+      <ion-fab-button id="fileInput" color="medium" class="custom-file-input" (click)="takePicture()">
+        <ion-icon name="camera-outline"></ion-icon>
+      </ion-fab-button >
+    </ion-fab>
 
+    <br><br><br><br>
     <ion-row>
       <ion-col size="12">
         <ion-button expand="block" (click)="updateItem()">Update</ion-button>

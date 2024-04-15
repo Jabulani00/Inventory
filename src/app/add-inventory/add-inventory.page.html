@@ -70,11 +70,22 @@
           <ion-input type="time" [(ngModel)]="timeOfPickup"></ion-input>
         </ion-item>
       </ion-list>
-      <ion-button expand="block" id="fileInput" color="medium" class="custom-file-input" (click)="takePicture()">
-        <ion-icon name="camera"></ion-icon> Take Picture
-      </ion-button>
-      <ion-button expand="block" (click)="addItem()" color="primary">Add Item</ion-button>
-      <ion-button expand="block" (click)="generateSlip()" color="success">DONE</ion-button>
+      
+      <ion-button expand="block" (click)="addItem()" >Add Item</ion-button>
+      <br><br>
+
+      <ion-fab vertical="bottom" horizontal="end">
+        <ion-fab-button (click)="generateSlip()" >
+          <ion-icon name="print-outline"></ion-icon>
+        </ion-fab-button >
+      </ion-fab>
+
+      <ion-fab vertical="bottom" horizontal="start">
+        <ion-fab-button id="fileInput" color="medium" class="custom-file-input" (click)="takePicture()" >
+          <ion-icon name="camera-outline"></ion-icon>
+        </ion-fab-button >
+      </ion-fab>
+
     </ion-card-content>
   </ion-card>
 </ion-content>

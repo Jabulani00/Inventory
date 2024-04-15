@@ -12,11 +12,10 @@ import 'firebase/compat/firestore';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
-  email: string = '';
-  password: string = '';
-  defaultAdminEmail: string = 'admin@best.com';
-  defaultAdminPassword: string = '@bestB1234';
-
+  email = '';
+  password = '';
+  defaultAdminEmail = 'admin@best.com';
+  defaultAdminPassword = '@bestB1234';
   private usersCollection: AngularFirestoreCollection<any>;
 
   constructor(
@@ -42,21 +41,24 @@ export class LoginPage implements OnInit {
   }
 
   async login() {
+    const email = this.email.trim();
+    const password = this.password.trim();
+
     // Email validation
-    if (!this.email.trim()) {
+    if (!email) {
       this.presentToast('Please enter your email address', 'danger');
       return;
     }
 
     // Email format validation
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(this.email)) {
+    const emailPattern = /^\S+@\S+\.\S+$/;
+    if (!emailPattern.test(email)) {
       this.presentToast('Please enter a valid email address', 'danger');
       return;
     }
 
     // Password validation
-    if (!this.password.trim()) {
+    if (!password) {
       this.presentToast('Please enter your password', 'danger');
       return;
     }
@@ -68,7 +70,7 @@ export class LoginPage implements OnInit {
     await loader.present();
 
     // Check if the user is trying to log in with the default admin credentials
-    if (this.email === this.defaultAdminEmail && this.password === this.defaultAdminPassword) {
+    if (email === this.defaultAdminEmail && password === this.defaultAdminPassword) {
       loader.dismiss();
       this.router.navigate(['/user-profiles']);
       return;
@@ -76,8 +78,7 @@ export class LoginPage implements OnInit {
 
     try {
       // Query Firestore to find the document with the matching email
-      const userQuerySnapshot = await this.usersCollection.ref.where('email', '==', this.email).get();
-
+      const userQuerySnapshot = await this.usersCollection.ref.where('email', '==', email).get();
       if (userQuerySnapshot.empty) {
         loader.dismiss();
         this.presentToast('User does not exist', 'danger');
@@ -87,7 +88,6 @@ export class LoginPage implements OnInit {
       // Since email is unique, there should be only one document in the query snapshot
       const userData = userQuerySnapshot.docs[0].data();
       const role = userData['role'];
-
       let redirectPage: string;
 
       // Check the role and set the redirectPage accordingly
@@ -103,12 +103,13 @@ export class LoginPage implements OnInit {
           break;
       }
 
-      await this.auth.signInWithEmailAndPassword(this.email, this.password);
+      await this.auth.signInWithEmailAndPassword(email, password);
       loader.dismiss();
       this.router.navigate([redirectPage]);
-    } catch (error: any) { // Explicitly define the type of 'error' as 'any'
+    } catch (error: any) {
       loader.dismiss();
-      const errorMessage = error.message || 'An unknown error occurred.'; // Handle the case where error.message is undefined
+      const errorMessage = error.message || 'An unknown error occurred.';
+
       if (errorMessage.includes('wrong-password')) {
         this.presentToast('Incorrect password', 'danger');
       } else if (errorMessage.includes('user-not-found')) {
