@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title class="ion-text-center">Manager</ion-title>
+    <ion-title class="ion-text-center">Best Brightness</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -24,6 +24,14 @@
 
   <!-- Placeholder content for different segments -->
   <div *ngIf="segment === 'addInventory'">
+    <router-outlet></router-outlet>
+  </div>
+
+  <div *ngIf="segment === 'moveToStore'">
+    <router-outlet></router-outlet>
+  </div>
+
+  <div *ngIf="segment === 'UpdateStore'">
     <router-outlet></router-outlet>
   </div>
 

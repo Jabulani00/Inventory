@@ -16,6 +16,18 @@ export class ManagerPage implements OnInit {
       description: 'Add new items to the store room inventory.',
     },
     {
+      value: 'moveToStore',
+      label: 'Move Inventory to Store',
+      icon: 'play-forward-outline',
+      description: 'move Inventory from storeroom to store.',
+    },
+    {
+      value: 'UpdateStore',
+      label: 'Update Store Inventory',
+      icon: 'arrow-undo-circle-outline',
+      description: 'Update items at the store  inventory.',
+    },
+    {
       value: 'viewAnalytics',
       label: 'View Analytics',
       icon: 'analytics-outline',
@@ -54,7 +66,7 @@ export class ManagerPage implements OnInit {
       case 'viewAnalytics':
         this.router.navigate(['analytics']);
         break;
-      case 'viewInventory':
+      case 'viewStore':
         this.router.navigate(['view']);
         break;
       case 'viewUsers':
@@ -62,6 +74,12 @@ export class ManagerPage implements OnInit {
         break;
       case 'viewInvoices':
         this.router.navigate(['invoice']);
+        break;
+      case 'moveToStore':
+        this.router.navigate(['add-inventory']);
+        break;
+      case 'UpdateStore':
+        this.router.navigate(['update']);
         break;
       default:
         // Handle default case or error

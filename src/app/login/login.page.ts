@@ -44,37 +44,11 @@ export class LoginPage implements OnInit {
     const email = this.email.trim();
     const password = this.password.trim();
 
-    // Email validation
-    if (!email) {
-      this.presentToast('Please enter your email address', 'danger');
-      return;
-    }
-
-    // Email format validation
-    const emailPattern = /^\S+@\S+\.\S+$/;
-    if (!emailPattern.test(email)) {
-      this.presentToast('Please enter a valid email address', 'danger');
-      return;
-    }
-
-    // Password validation
-    if (!password) {
-      this.presentToast('Please enter your password', 'danger');
-      return;
-    }
-
     const loader = await this.loadingController.create({
       message: 'Logging in...',
       cssClass: 'custom-loader-class',
     });
     await loader.present();
-
-    // Check if the user is trying to log in with the default admin credentials
-    if (email === this.defaultAdminEmail && password === this.defaultAdminPassword) {
-      loader.dismiss();
-      this.router.navigate(['/user-profiles']);
-      return;
-    }
 
     try {
       // Query Firestore to find the document with the matching email
@@ -85,27 +59,12 @@ export class LoginPage implements OnInit {
         return;
       }
 
-      // Since email is unique, there should be only one document in the query snapshot
-      const userData = userQuerySnapshot.docs[0].data();
-      const role = userData['role'];
-      let redirectPage: string;
-
-      // Check the role and set the redirectPage accordingly
-      switch (role) {
-        case 'Manager':
-          redirectPage = '/manager';
-          break;
-        case 'picker':
-          redirectPage = '/menu';
-          break;
-        default:
-          redirectPage = '/view';
-          break;
+      if (email === this.defaultAdminEmail && password === this.defaultAdminPassword) {
+        await this.auth.signInWithEmailAndPassword(email, password);
       }
 
-      await this.auth.signInWithEmailAndPassword(email, password);
       loader.dismiss();
-      this.router.navigate([redirectPage]);
+      this.router.navigate(['/manager']);
     } catch (error: any) {
       loader.dismiss();
       const errorMessage = error.message || 'An unknown error occurred.';
@@ -119,4 +78,5 @@ export class LoginPage implements OnInit {
       }
     }
   }
+
 }

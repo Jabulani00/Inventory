@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2  } from '@angular/core';
+import { Component, OnInit, Renderer2 } from '@angular/core';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { finalize } from 'rxjs/operators';
@@ -7,6 +7,8 @@ import { AlertController, LoadingController, ToastController } from '@ionic/angu
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 const pdfMake = require('pdfmake/build/pdfmake.js');
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { FileOpener, FileOpenerOptions } from '@capacitor-community/file-opener';
 
 
 @Component({
@@ -33,6 +35,7 @@ export class AddInventoryStoreroomPage implements OnInit {
   phone:any;
   Cumpany:any;
   pickersDetailsEmail:any;
+  sizeProduct:any;
 
 
 
@@ -73,47 +76,6 @@ export class AddInventoryStoreroomPage implements OnInit {
     const snapshot = await uploadTask;
     return snapshot.ref.getDownloadURL();
   }
-  
-
-  async searchProductByBarcode() {
-    if (this.barcode.trim() === '') {
-      // If the barcode input is empty, clear other input fields
-      this.clearFieldsExceptBarcode();
-      return;
-    }
-  
-    // Search for the product with the entered barcode in Firestore
-    const querySnapshot = await this.firestore
-      .collection('storeroomInventory')
-      .ref.where('barcode', '==', this.barcode.trim())
-      .limit(1)
-      .get();
-  
-    if (!querySnapshot.empty) {
-      // If a product with the entered barcode is found, populate the input fields
-      const productData:any = querySnapshot.docs[0].data();
-      this.itemName = productData.name;
-      this.itemCategory = productData.category;
-      this.itemDescription = productData.description;
-      // You can similarly populate other input fields here
-    } else {
-      // If no product with the entered barcode is found, clear other input fields
-      this.clearFieldsExceptBarcode();
-      this.presentToast('Product not found', 'warning');
-    }
-  }
-  
-  clearFieldsExceptBarcode() {
-    // Clear all input fields except the barcode input
-    this.itemName = '';
-    this.itemCategory = '';
-    this.itemDescription = '';
-    // Clear other input fields here
-  }
-  
-
-
-  
   hideCard() {
     const cardElement = document.getElementById('container');
     if (cardElement) {
@@ -185,8 +147,6 @@ showCard() {
     }
   }
   
- 
-  
 
 
 
@@ -219,8 +179,41 @@ showCard() {
         location:"storeroom",
         pickersDetailsEmail:this.pickersDetailsEmail,
         phone :this.phone,
-        Cumpany:this.Cumpany
+        Cumpany:this.Cumpany,
+        sizeProduct:this.sizeProduct,
       };
+
+
+
+      const querySnapshot = await this.firestore
+      .collection('storeroomInventory')
+      .ref.where('barcode', '==', this.barcode.trim())
+      .limit(1)
+      .get();
+
+
+      if (!querySnapshot.empty) {
+        // If a product with the entered barcode is found, populate the input fields
+        const productData:any = querySnapshot.docs[0].data();
+        const docId:any= querySnapshot.docs[0].id;
+        console.log(productData.quantity );
+      
+        this.firestore.collection('storeroomInventory').doc(docId).update({
+          name: this.itemName,
+          category: this.itemCategory,
+          description: this.itemDescription,
+          imageUrl: this.imageUrl || '',
+          quantity: (productData.quantity + this.itemQuantity),
+          sizeProduct:this.sizeProduct,
+         });
+ 
+        console.log("updated and added");
+        this.presentToast('Item added to cart','success');
+        this.clearFields();
+        return 
+        }
+
+
       this.cart.push(newItem);
       console.log(this.cart);
       this.presentToast('Item added to cart','success');
@@ -234,130 +227,212 @@ showCard() {
     }
   }
 
+
+
+
+
+
+
+
+
+  async searchProductByBarcode() {
+    if (this.barcode.trim() === '') {
+      // If the barcode input is empty, clear other input fields
+      this.clearFieldsExceptBarcode();
+      return;
+    }
+  
+    // Search for the product with the entered barcode in Firestore
+    const querySnapshot = await this.firestore
+      .collection('storeroomInventory')
+      .ref.where('barcode', '==', this.barcode.trim())
+      .limit(1)
+      .get();
+  
+    if (!querySnapshot.empty) {
+      // If a product with the entered barcode is found, populate the input fields
+      const productData:any = querySnapshot.docs[0].data();
+      this.itemName = productData.name;
+      this.itemCategory = productData.category;
+      this.itemDescription = productData.description;
+      this.sizeProduct = productData.sizeProduct;
+      // You can similarly populate other input fields here
+    } else {
+      // If no product with the entered barcode is found, clear other input fields
+      this.clearFieldsExceptBarcode();
+      this.presentToast('Product not found', 'warning');
+    }
+  }
+  
+  clearFieldsExceptBarcode() {
+    // Clear all input fields except the barcode input
+    this.itemName = '';
+    this.itemCategory = '';
+    this.itemDescription = '';
+    this.sizeProduct ='';
+    // Clear other input fields here
+  }
+  
+
+
   async generateSlip() {
+    if (!this.cart.length) {
+        return;
+    }
+
     const loader = await this.loadingController.create({
-      message: 'Generating Slip...',
+        message: 'Generating Slip...',
     });
     await loader.present();
-  console.log("data",this.cart)
+
     try {
-      // Create a slip document in Firestore
-      const slipData = {
-        date: new Date(),
-        items: this.cart.map(item => ({
-          name: item.name,
-          quantity: item.quantity,
-          category: item.category,
-          description: item.description,
-          imageUrl: item.imageUrl,
-          pickersDetails: item.pickersDetails,
-          dateOfPickup: item.dateOfPickup,
-          timeOfPickup: item.timeOfPickup,
-          barcode: item.barcode,
-          pickersDetailsEmail:this.pickersDetailsEmail,
-          phone :this.phone,
-          Cumpany:this.Cumpany
-        })),
-      };
-      await this.firestore.collection('slips').add(slipData);
-      pdfMake.vfs = pdfFonts.pdfMake.vfs;
-     // Calculate column widths based on content length
+        const slipData = {
+            date: new Date(),
+            items: this.cart.map(item => ({
+                name: item.name,
+                quantity: item.quantity,
+                category: item.category,
+                description: item.description,
+                imageUrl: item.imageUrl,
+                pickersDetails: item.pickersDetails,
+                dateOfPickup: item.dateOfPickup,
+                timeOfPickup: item.timeOfPickup,
+                barcode: item.barcode,
+                phone: item.phone,
+                Cumpany: item.Cumpany,
+                pickersDetailsEmail: this.pickersDetailsEmail,
+                sizeProduct: item.sizeProduct,
+            })),
+        };
 
+        pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-// Define PDF content
-// Define PDF content
-// Define PDF content
-const docDefinition = {
-  content: [
-      {
-          text: 'BEST BRIGHT', // Adding the company name to the header
-          style: 'companyName'
-      },
-      {
-          text: 'Invoice',
-          style: 'header'
-      },
-      {
-          text: `Date: ${new Date().toLocaleDateString()}`,
-          style: 'subheader'
-      },
-      {
-          table: {
-              headerRows: 1,
-              widths: [ 76, 76,76,76,76,76 ],
-              body: [
-                  [
-                      { text: 'Name', style: 'tableHeader' },
-                      { text: 'Category', style: 'tableHeader' },
-                      { text: 'Description', style: 'tableHeader' },
-                      { text: 'Quantity', style: 'tableHeader' },
-                      { text: 'Picker\'s Details', style: 'tableHeader' },
-                      { text: 'Barcode', style: 'tableHeader' }
-                  ],
-                  ...this.cart.map(item => [
-                      item.name,
-                      item.category,
-                      item.description,
-                      item.quantity.toString(),
-                      item.pickersDetails,
-                      item.barcode
-                  ])
-              ]
-          }
-      }
-  ],
-  styles: {
-      header: {
-          fontSize: 24,
-          bold: true,
-          margin: [0, 0, 0, 10],
-          alignment: 'center',
-          color: '#007bff' // Blue color for the header
-      },
-      subheader: {
-          fontSize: 14,
-          bold: true,
-          margin: [0, 10, 0, 10]
-      },
-      tableHeader: {
-          bold: true,
-          fontSize: 12,
-          color: 'black',
-          alignment: 'center'
-      },
-      companyName: { // Style for the company name
-          fontSize: 28,
-          bold: true,
-          margin: [0, 0, 0, 20], // Adjust margin to separate company name from header
-          alignment: 'center',
-          color: '#dc3545' // Red color for the company name
-      }
-  }
-};
+        const docDefinition = {
+            content: [
+                {
+                    text: 'BEST BRIGHT',
+                    style: 'companyName'
+                },
+                {
+                    text: 'SLIP',
+                    style: 'header'
+                },
+                {
+                    text: `Date: ${new Date().toLocaleDateString()}`,
+                    style: 'subheader'
+                },
+                ...this.cart.flatMap((item, index) => [
+                    {
+                        canvas: [
+                            {
+                                type: 'rect',
+                                x: 0,
+                                y: 0,
+                                w: 515,
+                                h: 30,
+                                r: 3,
+                                fillColor: index % 2 === 0 ? '#004445' : null,
+                                lineWidth: 1,
+                                lineColor: '#2c786c'
+                            }
+                        ],
+                        margin: [0, 10]
+                    },
+                    {
+                        columns: [
+                            {
+                                width: 'auto',
+                                text: [
+                                    { text: 'Name: ', bold: true },
+                                    item.name,
+                                    '\n',
+                                    { text: 'Category: ', bold: true },
+                                    item.category,
+                                    '\n',
+                                    { text: 'Description: ', bold: true },
+                                    item.description,
+                                    '\n',
+                                    { text: 'Quantity: ', bold: true },
+                                    item.quantity.toString(),
+                                    '\n',
+                                    { text: 'Size: ', bold: true },
+                                    item.sizeProduct,
+                                    '\n',
+                                    { text: 'Deliver Name: ', bold: true },
+                                    item.pickersDetails,
+                                    '\n',
+                                    { text: 'Delivery Company: ', bold: true },
+                                    item.Cumpany,
+                                    '\n',
+                                    { text: 'Phone: ', bold: true },
+                                    item.Phone,
+                                    '\n',
+                                    { text: 'Barcode: ', bold: true },
+                                    item.barcode,
+                                ]
+                            }
+                        ],
+                        margin: [10, 10]
+                    }
+                ])
+            ],
+            styles: {
+                header: {
+                    fontSize: 28,
+                    bold: true,
+                    margin: [0, 0, 0, 10],
+                    alignment: 'center',
+                    color: '#004445',
+                },
+                subheader: {
+                    fontSize: 16,
+                    bold: true,
+                    margin: [0, 10, 0, 10],
+                    alignment: 'center',
+                },
+                companyName: {
+                    fontSize: 36,
+                    bold: true,
+                    margin: [0, 0, 0, 20],
+                    alignment: 'center',
+                    color: '#2c786c',
+                }
+            }
+        };
 
+        const pdfDoc = await pdfMake.createPdf(docDefinition).open();
 
+        pdfDoc.getBase64(async (data: string) => {
+            try {
+                const fileName = `bestBrightness/${Date.now().toLocaleString()}_storeroom.pdf`;
+                const result = await Filesystem.writeFile({
+                    path: fileName,
+                    data: data,
+                    directory: Directory.Documents,
+                    recursive: true
+                });
 
+                const options: FileOpenerOptions = {
+                    filePath: `${result.uri}`,
+                    contentType: 'application/pdf',
+                    openWithDefault: true,
+                };
 
-    // Generate PDF
-    //pdfMake.createPdf(docDefinition).open();
-    const pdfDocGenerator = await pdfMake.createPdf(docDefinition);
-      // Clear the cart after generating the slip
-      pdfDocGenerator.open();
-      this.cart = [];
-  
-      // Show success toast notification
-      this.presentToast('Slip generated successfully',"success");
+                await FileOpener.open(options);
+                loader.dismiss();
+                this.cart = [];
+            } catch (error) {
+                loader.dismiss();
+                console.error('Error saving or opening PDF:', error);
+            }
+        });
     } catch (error) {
-      console.error('Error generating slip:', error);
-      // Handle error
-    } finally {
-      loader.dismiss();
+        loader.dismiss();
+        console.error('Error generating slip:', error);
     }
-   
-    
-
-
 }
+
+
 
 clearFields() {
   this.itemName = '';
@@ -368,6 +443,7 @@ clearFields() {
   this.dateOfPickup = '';
   this.timeOfPickup = '';
   this.barcode = '';
+  this.sizeProduct='';
   this.imageBase64 = null;
   this.imageUrl = null;
 }
@@ -400,4 +476,7 @@ async presentToast(message: string,color:string) {
   });
   toast.present();
 }
+
+
+
 }

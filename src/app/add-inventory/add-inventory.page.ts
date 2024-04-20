@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2  } from '@angular/core';
+import { Component, OnInit, Renderer2 } from '@angular/core';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { finalize } from 'rxjs/operators';
@@ -10,7 +10,9 @@ import {
   ToastController,
 } from '@ionic/angular';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { BarcodeScannerPage } from '../barcode-scanner/barcode-scanner.page';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { FileOpener, FileOpenerOptions } from '@capacitor-community/file-opener';
+
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 const pdfMake = require('pdfmake/build/pdfmake.js');
 
@@ -34,9 +36,11 @@ export class AddInventoryPage implements OnInit {
   qrCodeIdentifire: any;
   currentDate: Date;
   currentTime: string;
+  sizeProduct: string='';
 
   // Variable to hold the barcode value
   toggleChecked: boolean = false;
+  inventoryItems: any;;
 
   constructor(
     private renderer: Renderer2,
@@ -51,6 +55,7 @@ export class AddInventoryPage implements OnInit {
     this.currentTime = this.currentDate.toLocaleTimeString("en-US", {
       hour12: false,
     });
+  
   }
 
   ngOnInit() {
@@ -78,6 +83,8 @@ export class AddInventoryPage implements OnInit {
     return snapshot.ref.getDownloadURL();
   }
 
+ 
+  
   async searchProductByBarcode() {
     if (this.barcode.trim() === '') {
       // If the barcode input is empty, clear other input fields
@@ -172,7 +179,7 @@ showCard() {
    
       // You can similarly populate other input fields here
     } else {
-      this.presentToast('Product not found', 'warning');
+      //this.presentToast('Product not found', 'warning');
     }// log the raw scanned content
       window.document.querySelector('ion-app')?.classList.remove('cameraView');
     }
@@ -188,8 +195,6 @@ showCard() {
   document.querySelector('body')?.classList.remove('scanner-active');
     }
   }
-
- 
   checkBookingDateTime(date: any, startTime: any): void {
     // Check if the date is in the past
     if (date >= this.currentDate.toISOString().split("T")[0]) {
@@ -205,6 +210,19 @@ showCard() {
     // Check if the time is in the past
   }
   async addItem() {
+    const newItem = {
+      name: this.itemName,
+      category: this.itemCategory,
+      description: this.itemDescription,
+      imageUrl: this.imageUrl || '',
+      quantity: this.itemQuantity,
+      pickersDetails: this.pickersDetails,
+      dateOfPickup: this.dateOfPickup,
+      timeOfPickup: this.timeOfPickup,
+      barcode: this.barcode || '',
+      timestamp: new Date(),
+    };
+
     let itemQuantity = 0;
     this.checkBookingDateTime(this.currentDate,this.currentTime);
     const loader = await this.loadingController.create({
@@ -266,27 +284,22 @@ showCard() {
         .get();
       if (!existingItemQueryStore.empty) {
         // Update the quantity of the existing item in the storeroomInventory collection
-        const existingItemDoc = existingItemQuery.docs[0];
-        const existingItemData: any = existingItemDoc.data();
-        const updatedQuantity = existingItemData.quantity + this.itemQuantity;
-        this.itemQuantity += updatedQuantity;
-        await existingItemDoc.ref.update({ quantity: updatedQuantity });
+        const existingItemDoc2 = existingItemQueryStore.docs[0];
+        const existingItemData2: any = existingItemDoc2.data();
+       let updatedQuantity = existingItemData2.quantity + this.itemQuantity;
+       // updatedQuantity += this.itemQuantity;
+        await existingItemDoc2.ref.update({
+          name: this.itemName,
+          category: this.itemCategory,
+           description: this.itemDescription,
+           quantity: updatedQuantity });
+        this.cart.push(newItem);
         console.log('Storeroom Inventory Updated (Plused)');
+        this.clearFields();
         return;
       }
 
-      const newItem = {
-        name: this.itemName,
-        category: this.itemCategory,
-        description: this.itemDescription,
-        imageUrl: this.imageUrl || '',
-        quantity: this.itemQuantity,
-        pickersDetails: this.pickersDetails,
-        dateOfPickup: this.dateOfPickup,
-        timeOfPickup: this.timeOfPickup,
-        barcode: this.barcode || '',
-        timestamp: new Date(),
-      };
+      
       this.cart.push(newItem);
 
       this.presentToast('Item added to cart',"successfull");
@@ -301,117 +314,154 @@ showCard() {
   }
 
   async generateSlip() {
+    if (!this.cart.length) {
+        return;
+    }
+
     const loader = await this.loadingController.create({
-      message: 'Generating Slip...',
+        message: 'Generating Slip...',
     });
     await loader.present();
 
     try {
-      // Create a slip document in Firestore
-      const slipData = {
-        date: new Date(),
-        items: this.cart.map((item) => ({
-          name: item.name,
-          quantity: item.quantity,
-          category: item.category,
-          description: item.description,
-          imageUrl: item.imageUrl,
-          pickersDetails: item.pickersDetails,
-          dateOfPickup: item.dateOfPickup,
-          timeOfPickup: item.timeOfPickup,
-          barcode: item.barcode,
-        })),
-      };
-      await this.firestore.collection('slips').add(slipData);
-      pdfMake.vfs = pdfFonts.pdfMake.vfs;
+        const slipData = {
+            date: new Date(),
+            items: this.cart.map(item => ({
+                name: item.name,
+                quantity: item.quantity,
+                category: item.category,
+                description: item.description,
+                imageUrl: item.imageUrl,
+                pickersDetails: item.pickersDetails,
+                dateOfPickup: item.dateOfPickup,
+                timeOfPickup: item.timeOfPickup,
+                barcode: item.barcode,
+                sizeProduct: item.sizeProduct,
+            })),
+        };
 
-      // Define PDF content
-const docDefinition = {
-  content: [
-      {
-          text: 'BEST BRIGHT', // Adding the company name to the header
-          style: 'companyName'
-      },
-      {
-          text: 'Invoice',
-          style: 'header'
-      },
-      {
-          text: `Date: ${new Date().toLocaleDateString()}`,
-          style: 'subheader'
-      },
-      {
-          table: {
-              headerRows: 1,
-              widths: [ '75', '75', '75', '75', '75', '75' ],
-              body: [
-                  [
-                      { text: 'Name', style: 'tableHeader' },
-                      { text: 'Category', style: 'tableHeader' },
-                      { text: 'Description', style: 'tableHeader' },
-                      { text: 'Quantity', style: 'tableHeader' },
-                      { text: 'Picker\'s Details', style: 'tableHeader' },
-                      { text: 'Barcode', style: 'tableHeader' }
-                  ],
-                  ...this.cart.map(item => [
-                      item.name,
-                      item.category,
-                      item.description,
-                      item.quantity.toString(),
-                      item.pickersDetails,
-                      item.barcode
-                  ])
-              ]
-          }
-      }
-  ],
-  styles: {
-      header: {
-          fontSize: 24,
-          bold: true,
-          margin: [0, 0, 0, 10],
-          alignment: 'center',
-          color: '#007bff' // Blue color for the header
-      },
-      subheader: {
-          fontSize: 14,
-          bold: true,
-          margin: [0, 10, 0, 10]
-      },
-      tableHeader: {
-          bold: true,
-          fontSize: 12,
-          color: 'black',
-          alignment: 'center'
-      },
-      companyName: { // Style for the company name
-          fontSize: 28,
-          bold: true,
-          margin: [0, 0, 0, 20], // Adjust margin to separate company name from header
-          alignment: 'center',
-          color: '#dc3545' // Red color for the company name
-      }
-  }
-};
+        pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-    // Generate PDF
-    //pdfMake.createPdf(docDefinition).open();
-    const pdfDocGenerator = await pdfMake.createPdf(docDefinition);
-      // Clear the cart after generating the slip
-      pdfDocGenerator.open();
-      this.cart = [];
-      // Clear the cart after generating the slip
+        const docDefinition = {
+            content: [
+                {
+                    text: 'BEST BRIGHT',
+                    style: 'companyName'
+                },
+                {
+                    text: 'SLIP',
+                    style: 'header'
+                },
+                {
+                    text: `Date: ${new Date().toLocaleDateString()}`,
+                    style: 'subheader'
+                },
+                ...this.cart.flatMap((item, index) => [
+                    {
+                        canvas: [
+                            {
+                                type: 'rect',
+                                x: 0,
+                                y: 0,
+                                w: 515,
+                                h: 30,
+                                r: 3,
+                                fillColor: index % 2 === 0 ? '#f2f2f2' : null,
+                                lineWidth: 1,
+                                lineColor: '#cccccc'
+                            }
+                        ],
+                        margin: [0, 10]
+                    },
+                    {
+                        columns: [
+                            {
+                                width: 'auto',
+                                text: [
+                                    { text: 'Name: ', bold: true },
+                                    item.name,
+                                    '\n',
+                                    { text: 'Category: ', bold: true },
+                                    item.category,
+                                    '\n',
+                                    { text: 'Description: ', bold: true },
+                                    item.description,
+                                    '\n',
+                                    { text: 'Quantity: ', bold: true },
+                                    item.quantity.toString(),
+                                    '\n',
+                                    { text: 'Size: ', bold: true },
+                                    item.sizeProduct,
+                                    '\n',
+                                    { text: 'Picker\'s Details: ', bold: true },
+                                    item.pickersDetails,
+                                    '\n',
+                                    { text: 'Barcode: ', bold: true },
+                                    item.barcode,
+                                ]
+                            }
+                        ],
+                        margin: [10, 10]
+                    }
+                ])
+            ],
+            styles: {
+                header: {
+                    fontSize: 28,
+                    bold: true,
+                    margin: [0, 0, 0, 10],
+                    alignment: 'center',
+                    color: '#664cdd',
+                },
+                subheader: {
+                    fontSize: 16,
+                    bold: true,
+                    margin: [0, 10, 0, 10],
+                    alignment: 'center',
+                },
+                companyName: {
+                    fontSize: 36,
+                    bold: true,
+                    margin: [0, 0, 0, 20],
+                    alignment: 'center',
+                    color: '#A393EB',
+                }
+            }
+        };
 
+        const pdfDoc = await pdfMake.createPdf(docDefinition).open();
 
-      // Show success toast notification
-      this.presentToast('Slip generated successfully',"successfull");
+        pdfDoc.getBase64(async (data: string) => {
+            try {
+                const fileName = `bestBrightness/${Date.now().toLocaleString()}_storeroom.pdf`;
+                const result = await Filesystem.writeFile({
+                    path: fileName,
+                    data: data,
+                    directory: Directory.Documents,
+                    recursive: true
+                });
+
+                const options: FileOpenerOptions = {
+                    filePath: `${result.uri}`,
+                    contentType: 'application/pdf',
+                    openWithDefault: true,
+                };
+
+                await FileOpener.open(options);
+                loader.dismiss();
+                this.cart = [];
+            } catch (error) {
+                loader.dismiss();
+                console.error('Error saving or opening PDF:', error);
+            }
+        });
     } catch (error) {
-      console.error('Error generating slip:', error);
-      // Handle error
-    } finally {
-      loader.dismiss();
+        loader.dismiss();
+        console.error('Error generating slip:', error);
     }
-  }
+}
+
+
 
   clearFields() {
     this.itemName = '';
