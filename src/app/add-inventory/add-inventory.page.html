@@ -1,9 +1,9 @@
 <ion-header>
   <ion-toolbar >
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/manager"></ion-back-button>
+      <ion-back-button routerLink="/manager"></ion-back-button>
     </ion-buttons>
-    <ion-title class="ion-text-center">Add Inventory</ion-title>
+    <ion-title class="ion-text-center">Pickup Inventory from Storeroom </ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="closeScanner()">
         <ion-icon slot="icon-only" name="close"></ion-icon>
@@ -53,6 +53,10 @@
         </ion-item>
         <ion-item>
           <ion-input type="number" [(ngModel)]="itemQuantity" placeholder="Quantity"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input type="number" [(ngModel)]="sizeProduct" placeholder="Size"></ion-input>
         </ion-item>
 
         <ion-list-header>

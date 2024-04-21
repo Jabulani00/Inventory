@@ -216,6 +216,7 @@ showCard() {
       description: this.itemDescription,
       imageUrl: this.imageUrl || '',
       quantity: this.itemQuantity,
+      sizeProduct:this.sizeProduct,
       pickersDetails: this.pickersDetails,
       dateOfPickup: this.dateOfPickup,
       timeOfPickup: this.timeOfPickup,
@@ -291,6 +292,7 @@ showCard() {
         await existingItemDoc2.ref.update({
           name: this.itemName,
           category: this.itemCategory,
+          sizeProduct:this.sizeProduct,
            description: this.itemDescription,
            quantity: updatedQuantity });
         this.cart.push(newItem);
@@ -319,7 +321,7 @@ showCard() {
     }
 
     const loader = await this.loadingController.create({
-        message: 'Generating Slip...',
+        message: 'Printing Slip...',
     });
     await loader.present();
 
@@ -345,11 +347,11 @@ showCard() {
         const docDefinition = {
             content: [
                 {
-                    text: 'BEST BRIGHT',
+                    text: 'BEST BRIGHTNESS',
                     style: 'companyName'
                 },
                 {
-                    text: 'SLIP',
+                    text: 'STORE INVOICE SLIP',
                     style: 'header'
                 },
                 {
@@ -429,7 +431,7 @@ showCard() {
             }
         };
 
-        const pdfDoc = await pdfMake.createPdf(docDefinition).open();
+        const pdfDoc = await pdfMake.createPdf(docDefinition);
 
         pdfDoc.getBase64(async (data: string) => {
             try {
