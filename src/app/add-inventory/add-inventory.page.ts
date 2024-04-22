@@ -105,6 +105,7 @@ export class AddInventoryPage implements OnInit {
       this.itemName = productData.name;
       this.itemCategory = productData.category;
       this.itemDescription = productData.description;
+      this.sizeProduct = productData.sizeProduct;
       // You can similarly populate other input fields here
     } else {
       // If no product with the entered barcode is found, clear other input fields
@@ -118,6 +119,7 @@ export class AddInventoryPage implements OnInit {
     this.itemName = '';
     this.itemCategory = '';
     this.itemDescription = '';
+    this.sizeProduct = '';
     // Clear other input fields here
   }
   
